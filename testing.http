@@ -1,0 +1,91 @@
+### Get all book
+GET http://localhost:3000/v1/books
+Accept: application/json
+
+### Get detail book
+GET http://localhost:3000/v1/books/3
+Accept: application/json
+
+### Create book
+POST http://localhost:3000/v1/books
+Accept: application/json
+Content-Type: application/json
+
+{
+  "publisher_id": 223,
+  "isbn": "09231323",
+  "title": "Bukuku ARU Bnget",
+  "author": "Sarudi",
+  "publication_year": "2004",
+  "amount": 23,
+  "bookshelf": "A231"
+}
+
+### Edited book
+PATCH http://localhost:3000/v1/books/1
+Accept: application/json
+Content-Type: application/json
+
+{
+  "id": 1,
+  "publisher_id": 232,
+  "isbn": "09231323 EDITED",
+  "title": "Bukuku EDITED",
+  "author": "Sarudi EDITED",
+  "publication_year": "2004",
+  "amount": 23,
+  "bookshelf": "A231"
+}
+
+### Delete book
+DELETE http://localhost:3000/v1/books/3
+Accept: application/json
+
+### Hard delete book
+DELETE http://localhost:3000/v1/books/delete/3
+Accept: application/json
+
+### Get all deleted book
+GET http://localhost:3000/v1/books/deleted
+Accept: application/json
+
+### Get all publisher
+GET http://localhost:3000/v1/publishers
+Accept: application/json
+
+### Get detail publisher
+GET http://localhost:3000/v1/publishers/19
+Accept: application/json
+
+### Create publisher
+POST http://localhost:3000/v1/publishers
+Accept: application/json
+Content-Type: application/json
+
+{
+  "name": "PT. Pratama Adi Putra LAGI DONG",
+  "description": "Publisher BANG LAGI"
+}
+
+### Edited publisher
+PATCH http://localhost:3000/v1/publishers/1
+Accept: application/json
+Content-Type: application/json
+
+{
+  "id": 1,
+  "name": "PT. Pratama Adi Putra UPDATED",
+  "description": "Publisher BANG UPDATED"
+}
+
+### Delete publisher
+DELETE http://localhost:3000/v1/publishers/4
+Accept: application/json
+
+### Get all deleted publisher
+GET http://localhost:3000/v1/publishers/deleted
+Accept: application/json
+
+### Hard delete publisher
+DELETE http://localhost:3000/v1/publishers/delete/4
+Accept: application/json
