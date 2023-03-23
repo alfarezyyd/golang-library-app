@@ -8,8 +8,9 @@ import (
 
 type BookUsecase interface {
 	FindAll(ctx *gin.Context) []response.BookResponse
-	FindById(ctx *gin.Context, bookID *int) response.BookResponse
+	FindByID(ctx *gin.Context, bookID *int) response.BookResponse
 	FindAllDeleted(ctx *gin.Context) []response.BookResponse
+	FindAllKindByBook(ctx *gin.Context, bookID *int) response.BookResponse
 	Create(ctx *gin.Context, bookCreateRequest *book.CreateRequestBook) response.BookResponse
 	Update(ctx *gin.Context, bookUpdateRequest *book.UpdateRequestBook) response.BookResponse
 	Delete(ctx *gin.Context, bookID *int)

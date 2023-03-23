@@ -18,4 +18,5 @@ type BookResponse struct {
 	CreatedAt       *time.Time      `json:"created_at,omitempty"`
 	UpdatedAt       *utils.NullTime `json:"updated_at,omitempty"`
 	DeletedAt       *gorm.DeletedAt `json:"deleted_at,omitempty"`
+	Kinds           []KindResponse  `json:"kinds"`
 }

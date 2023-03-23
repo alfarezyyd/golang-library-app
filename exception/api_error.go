@@ -10,6 +10,6 @@ func (apiError *APIError) Error() string {
 	return apiError.Details
 }
 
-func NewAPIError(status int, title string, details string) *APIError {
-	return &APIError{Status: status, Title: title, Details: details}
+func NewAPIError(statusError int, titleError string, detailError string) *APIError {
+	return &APIError{Status: statusError, Title: titleError, Details: detailError}
 }

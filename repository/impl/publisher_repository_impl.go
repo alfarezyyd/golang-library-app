@@ -1,8 +1,8 @@
 package impl
 
 import (
-	"context"
 	"errors"
+	"github.com/gin-gonic/gin"
 	"golang-library-app/helper"
 	"golang-library-app/model/domain"
 	"gorm.io/gorm"
@@ -15,61 +15,66 @@ func NewPublisherRepositoryImpl() *PublisherRepositoryImpl {
 	return &PublisherRepositoryImpl{}
 }
 
-func (publisherRepository *PublisherRepositoryImpl) FindAll(ctx context.Context, tx *gorm.DB) []domain.Publisher {
+func (publisherRepository *PublisherRepositoryImpl) FindAll(ctx *gin.Context, tx *gorm.DB) []domain.Publisher {
 	var allPublisher []domain.Publisher
-	resultQuery := tx.WithContext(ctx).Find(&allPublisher)
-	helper.LogFatalIfError(resultQuery.Error)
+	resultQuery := tx.WithContext(ctx.Request.Context()).Find(&allPublisher)
+	helper.CheckInternalServerError(ctx, resultQuery.Error)
 	return allPublisher
 }
 
-func (publisherRepository *PublisherRepositoryImpl) FindByID(ctx context.Context, tx *gorm.DB, publisherID *int) (domain.Publisher, error) {
+func (publisherRepository *PublisherRepositoryImpl) FindByID(ctx *gin.Context, tx *gorm.DB, publisherID *int) domain.Publisher {
 	var publisherData domain.Publisher
-	resultQuery := tx.WithContext(ctx).First(&publisherData, publisherID)
+	resultQuery := tx.WithContext(ctx.Request.Context()).First(&publisherData, publisherID)
 	if errors.Is(resultQuery.Error, gorm.ErrRecordNotFound) {
-		return publisherData, errors.New("publisher not found")
+		helper.CreateNotFoundError(ctx, resultQuery.Error)
 	}
-	return publisherData, nil
+	helper.CheckInternalServerError(ctx, resultQuery.Error)
+	return publisherData
 }
 
-func (publisherRepository *PublisherRepositoryImpl) FindDeletedByID(ctx context.Context, tx *gorm.DB, publisherID *int) (domain.Publisher, error) {
+func (publisherRepository *PublisherRepositoryImpl) FindDeletedByID(ctx *gin.Context, tx *gorm.DB, publisherID *int) domain.Publisher {
 	var publisherData domain.Publisher
-	resultQuery := tx.WithContext(ctx).Unscoped().First(&publisherData, publisherID)
+	resultQuery := tx.WithContext(ctx.Request.Context()).Unscoped().First(&publisherData, publisherID)
 	if errors.Is(resultQuery.Error, gorm.ErrRecordNotFound) {
-		return publisherData, errors.New("publisher not found")
+		helper.CreateNotFoundError(ctx, resultQuery.Error)
 	}
-	return publisherData, nil
+	helper.CheckInternalServerError(ctx, resultQuery.Error)
+	return publisherData
 }
 
-func (publisherRepository *PublisherRepositoryImpl) FindAllDeleted(ctx context.Context, tx *gorm.DB) []domain.Publisher {
+func (publisherRepository *PublisherRepositoryImpl) FindAllDeleted(ctx *gin.Context, tx *gorm.DB) []domain.Publisher {
 	var allDeletedPublisher []domain.Publisher
-	resultQuery := tx.WithContext(ctx).Unscoped().Find(&allDeletedPublisher)
-	helper.LogFatalIfError(resultQuery.Error)
+	resultQuery := tx.WithContext(ctx.Request.Context()).Unscoped().Find(&allDeletedPublisher)
+	if resultQuery.Error != nil {
+		helper.CreateNotFoundError(ctx, resultQuery.Error)
+	}
+	helper.CheckInternalServerError(ctx, resultQuery.Error)
 	return allDeletedPublisher
-
 }
 
-func (publisherRepository *PublisherRepositoryImpl) Create(ctx context.Context, tx *gorm.DB, publisherDomain *domain.Publisher) error {
-	resultManipulation := tx.WithContext(ctx).Debug().Omit("updated_at").Create(&publisherDomain)
-	if resultManipulation.Error != nil {
-		return errors.New(resultManipulation.Error.Error())
-	}
-	return nil
+func (publisherRepository *PublisherRepositoryImpl) FindAllBookByPublisher(ctx *gin.Context, tx *gorm.DB, publisherID *int) domain.Publisher {
+	var publisherData domain.Publisher
+	resultQuery := tx.WithContext(ctx.Request.Context()).Debug().Preload("Books").Find(&publisherData, publisherID)
+	helper.CheckInternalServerError(ctx, resultQuery.Error)
+	return publisherData
 }
 
-func (publisherRepository *PublisherRepositoryImpl) Update(ctx context.Context, tx *gorm.DB, publisherDomain *domain.Publisher) error {
-	resultManipulation := tx.WithContext(ctx).Save(&publisherDomain)
-	if resultManipulation.Error != nil {
-		return errors.New(resultManipulation.Error.Error())
-	}
-	return nil
+func (publisherRepository *PublisherRepositoryImpl) Create(ctx *gin.Context, tx *gorm.DB, publisherDomain *domain.Publisher) {
+	resultManipulation := tx.WithContext(ctx.Request.Context()).Debug().Omit("updated_at").Create(&publisherDomain)
+	helper.CheckInternalServerError(ctx, resultManipulation.Error)
 }
 
-func (publisherRepository *PublisherRepositoryImpl) Delete(ctx context.Context, tx *gorm.DB, publisherID *int) error {
-	tx.WithContext(ctx).Debug().Delete(&domain.Publisher{}, publisherID)
-	return nil
+func (publisherRepository *PublisherRepositoryImpl) Update(ctx *gin.Context, tx *gorm.DB, publisherDomain *domain.Publisher) {
+	resultManipulation := tx.WithContext(ctx.Request.Context()).Save(&publisherDomain)
+	helper.CheckInternalServerError(ctx, resultManipulation.Error)
 }
 
-func (publisherRepository *PublisherRepositoryImpl) PermanentDelete(ctx context.Context, tx *gorm.DB, publisherID *int) error {
-	tx.WithContext(ctx).Unscoped().Delete(&domain.Publisher{}, publisherID)
-	return nil
+func (publisherRepository *PublisherRepositoryImpl) Delete(ctx *gin.Context, tx *gorm.DB, publisherID *int) {
+	resultSql := tx.WithContext(ctx.Request.Context()).Debug().Delete(&domain.Publisher{}, publisherID)
+	helper.CheckInternalServerError(ctx, resultSql.Error)
+}
+
+func (publisherRepository *PublisherRepositoryImpl) PermanentDelete(ctx *gin.Context, tx *gorm.DB, publisherID *int) {
+	resultSql := tx.WithContext(ctx.Request.Context()).Unscoped().Delete(&domain.Publisher{}, publisherID)
+	helper.CheckInternalServerError(ctx, resultSql.Error)
 }

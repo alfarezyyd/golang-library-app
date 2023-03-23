@@ -1,8 +1,8 @@
 package impl
 
 import (
-	"context"
 	"errors"
+	"github.com/gin-gonic/gin"
 	"golang-library-app/helper"
 	"golang-library-app/model/domain"
 	"gorm.io/gorm"
@@ -15,73 +15,73 @@ func NewBookRepositoryImpl() *BookRepositoryImpl {
 	return &BookRepositoryImpl{}
 }
 
-func (bookRepository *BookRepositoryImpl) FindAll(ctx context.Context, tx *gorm.DB) []domain.Book {
+func (bookRepository *BookRepositoryImpl) FindAll(ctx *gin.Context, tx *gorm.DB) []domain.Book {
 	var allBook []domain.Book
-	resultQuery := tx.WithContext(ctx).Find(&allBook)
-	helper.LogFatalIfError(resultQuery.Error)
+	resultQuery := tx.WithContext(ctx.Request.Context()).Find(&allBook)
+	helper.CheckInternalServerError(ctx, resultQuery.Error)
 	return allBook
 }
 
-func (bookRepository *BookRepositoryImpl) FindByID(ctx context.Context, tx *gorm.DB, bookID *int) (domain.Book, error) {
+func (bookRepository *BookRepositoryImpl) FindByID(ctx *gin.Context, tx *gorm.DB, bookID *int) domain.Book {
 	var bookData domain.Book
-	resultQuery := tx.WithContext(ctx).First(&bookData, bookID)
+	resultQuery := tx.WithContext(ctx.Request.Context()).First(&bookData, bookID)
 	if errors.Is(resultQuery.Error, gorm.ErrRecordNotFound) {
-		return bookData, errors.New("book not found")
+		helper.CreateNotFoundError(ctx, resultQuery.Error)
 	}
-	return bookData, nil
+	helper.CheckInternalServerError(ctx, resultQuery.Error)
+	return bookData
 }
 
-func (bookRepository *BookRepositoryImpl) FindAllByPublisher(ctx context.Context, tx *gorm.DB, publisherID *int) []domain.Book {
+func (bookRepository *BookRepositoryImpl) FindAllDeleted(ctx *gin.Context, tx *gorm.DB) []domain.Book {
 	var allBook []domain.Book
-	resultQuery := tx.WithContext(ctx).Debug().Find(&allBook, *publisherID)
-	helper.LogFatalIfError(resultQuery.Error)
+	resultQuery := tx.WithContext(ctx.Request.Context()).Unscoped().Find(&allBook)
+	helper.CheckInternalServerError(ctx, resultQuery.Error)
 	return allBook
 }
 
-func (bookRepository *BookRepositoryImpl) FindAllDeleted(ctx context.Context, tx *gorm.DB) []domain.Book {
-	var allBook []domain.Book
-	resultQuery := tx.WithContext(ctx).Unscoped().Find(&allBook)
-	helper.LogFatalIfError(resultQuery.Error)
-	return allBook
-}
-
-func (bookRepository *BookRepositoryImpl) FindDeletedByID(ctx context.Context, tx *gorm.DB, bookID *int) (domain.Book, error) {
+func (bookRepository *BookRepositoryImpl) FindDeletedByID(ctx *gin.Context, tx *gorm.DB, bookID *int) domain.Book {
 	var bookData domain.Book
-	resultQuery := tx.WithContext(ctx).Unscoped().First(&bookData, bookID)
+	resultQuery := tx.WithContext(ctx.Request.Context()).Unscoped().First(&bookData, bookID)
 	if errors.Is(resultQuery.Error, gorm.ErrRecordNotFound) {
-		return bookData, errors.New("book not found")
+		helper.CreateNotFoundError(ctx, resultQuery.Error)
 	}
-	return bookData, nil
+	helper.CheckInternalServerError(ctx, resultQuery.Error)
+	return bookData
 }
 
-func (bookRepository *BookRepositoryImpl) Create(ctx context.Context, tx *gorm.DB, bookDomain *domain.Book) error {
-	resultManipulation := tx.WithContext(ctx).Debug().Omit("updated_at").Create(&bookDomain)
-	if resultManipulation.Error != nil {
-		return errors.New(resultManipulation.Error.Error())
+func (bookRepository *BookRepositoryImpl) FindAllKindByBook(ctx *gin.Context, tx *gorm.DB, bookID *int) domain.Book {
+	var bookData domain.Book
+	resultQuery := tx.WithContext(ctx.Request.Context()).Debug().Preload("Kinds").First(&bookData, bookID)
+	if errors.Is(resultQuery.Error, gorm.ErrRecordNotFound) {
+		helper.CreateNotFoundError(ctx, resultQuery.Error)
 	}
-	return nil
+	helper.CheckInternalServerError(ctx, resultQuery.Error)
+	return bookData
 }
 
-func (bookRepository *BookRepositoryImpl) Update(ctx context.Context, tx *gorm.DB, bookDomain *domain.Book) error {
-	resultManipulation := tx.WithContext(ctx).Debug().Save(&bookDomain)
-	if resultManipulation.Error != nil {
-		return errors.New(resultManipulation.Error.Error())
-	}
-	return nil
+func (bookRepository *BookRepositoryImpl) Create(ctx *gin.Context, tx *gorm.DB, bookDomain *domain.Book) {
+	resultManipulation := tx.WithContext(ctx.Request.Context()).Debug().Omit("updated_at").Create(&bookDomain)
+	helper.CheckInternalServerError(ctx, resultManipulation.Error)
 }
 
-func (bookRepository *BookRepositoryImpl) Delete(ctx context.Context, tx *gorm.DB, bookID *int) error {
-	resultSql := tx.WithContext(ctx).Delete(&domain.Book{}, bookID)
-	if errors.Is(resultSql.Error, gorm.ErrRecordNotFound) {
-		return errors.New("book not found")
+func (bookRepository *BookRepositoryImpl) CreateBookKinds(ctx *gin.Context, tx *gorm.DB, bookID *int, allBookKindID []int) {
+	for _, bookKindID := range allBookKindID {
+		resultManipulation := tx.Debug().Exec("INSERT INTO books_kinds(kind_id, book_id) VALUES (?,?)", bookKindID, bookID)
+		helper.CheckInternalServerError(ctx, resultManipulation.Error)
 	}
-	return nil
 }
 
-func (bookRepository *BookRepositoryImpl) PermanentDelete(ctx context.Context, tx *gorm.DB, bookID *int) error {
-	resultSql := tx.WithContext(ctx).Unscoped().Delete(&domain.Book{}, bookID)
-	if errors.Is(resultSql.Error, gorm.ErrRecordNotFound) {
-		return errors.New("book not found")
-	}
-	return nil
+func (bookRepository *BookRepositoryImpl) Update(ctx *gin.Context, tx *gorm.DB, bookDomain *domain.Book) {
+	resultManipulation := tx.WithContext(ctx.Request.Context()).Debug().Save(&bookDomain)
+	helper.CheckInternalServerError(ctx, resultManipulation.Error)
+}
+
+func (bookRepository *BookRepositoryImpl) Delete(ctx *gin.Context, tx *gorm.DB, bookID *int) {
+	resultSql := tx.WithContext(ctx.Request.Context()).Delete(&domain.Book{}, bookID)
+	helper.CheckInternalServerError(ctx, resultSql.Error)
+}
+
+func (bookRepository *BookRepositoryImpl) PermanentDelete(ctx *gin.Context, tx *gorm.DB, bookID *int) {
+	resultSql := tx.WithContext(ctx.Request.Context()).Unscoped().Delete(&domain.Book{}, bookID)
+	helper.CheckInternalServerError(ctx, resultSql.Error)
 }

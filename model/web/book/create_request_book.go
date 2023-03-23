@@ -8,5 +8,5 @@ type CreateRequestBook struct {
 	PublicationYear string `json:"publication_year,omitempty" binding:"required"`
 	Amount          uint   `json:"amount,omitempty" binding:"required"`
 	Bookshelf       string `json:"bookshelf,omitempty" binding:"required"`
-	//Kinds
+	KindsID         []int  `json:"kinds_id,omitempty"`
 }

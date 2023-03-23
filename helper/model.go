@@ -12,6 +12,12 @@ func ConvertToBookResponse(domainBook *domain.Book) response.BookResponse {
 		Time:  domainBook.UpdatedAt.Time,
 		Valid: domainBook.UpdatedAt.Valid,
 	}
+	var allKindResponse []response.KindResponse
+	for _, domainKind := range domainBook.Kinds {
+		kindResponse := ConvertToKindResponse(&domainKind)
+		allKindResponse = append(allKindResponse, kindResponse)
+	}
+
 	return response.BookResponse{
 		ID:              domainBook.ID,
 		PublisherID:     domainBook.PublisherID,
@@ -24,6 +30,7 @@ func ConvertToBookResponse(domainBook *domain.Book) response.BookResponse {
 		CreatedAt:       &domainBook.CreatedAt,
 		UpdatedAt:       &correctTime,
 		DeletedAt:       &domainBook.DeletedAt,
+		Kinds:           allKindResponse,
 	}
 }
 
@@ -53,5 +60,22 @@ func ConvertToPublisherResponse(domainPublisher *domain.Publisher) response.Publ
 		UpdatedAt:   &correctTime,
 		DeletedAt:   &domainPublisher.DeletedAt,
 		BooksData:   allBookResponse,
+	}
+}
+
+func ConvertToKindResponse(domainKind *domain.Kind) response.KindResponse {
+	var allBookResponse []response.BookResponse
+	for _, domainBook := range domainKind.Books {
+		bookResponse := ConvertToBookResponse(&domainBook)
+		allBookResponse = append(allBookResponse, bookResponse)
+	}
+	return response.KindResponse{
+		ID:          domainKind.ID,
+		Name:        domainKind.Name,
+		Description: domainKind.Description.String,
+		CreatedAt:   &domainKind.CreatedAt,
+		UpdatedAt:   &utils.NullTime{Time: domainKind.UpdatedAt.Time, Valid: domainKind.UpdatedAt.Valid},
+		Deleted:     &domainKind.DeletedAt,
+		Books:       allBookResponse,
 	}
 }

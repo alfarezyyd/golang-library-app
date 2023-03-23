@@ -38,21 +38,27 @@ func (publisherUsecase *PublisherUsecaseImpl) FindAll(ctx *gin.Context) []respon
 func (publisherUsecase *PublisherUsecaseImpl) FindById(ctx *gin.Context, publisherID *int) response.PublisherResponse {
 	tx := publisherUsecase.DB.Begin()
 	defer helper.CommitOrRollback(tx)
-	publisherData, err := publisherUsecase.PublisherRepository.FindByID(ctx, tx, publisherID)
-	helper.CreateApiErrorIfError(ctx, err, 400, "Not Found")
+	publisherData := publisherUsecase.PublisherRepository.FindByID(ctx, tx, publisherID)
 	return helper.ConvertToPublisherResponse(&publisherData)
 }
 
 func (publisherUsecase *PublisherUsecaseImpl) FindAllDeleted(ctx *gin.Context) []response.PublisherResponse {
 	tx := publisherUsecase.DB.Begin()
 	defer helper.CommitOrRollback(tx)
-	allPublisher := publisherUsecase.PublisherRepository.FindAllDeleted(ctx.Request.Context(), tx)
+	allPublisher := publisherUsecase.PublisherRepository.FindAllDeleted(ctx, tx)
 	var allPublisherResponse []response.PublisherResponse
 	for _, publisherData := range allPublisher {
 		publisherResponse := helper.ConvertToPublisherResponse(&publisherData)
 		allPublisherResponse = append(allPublisherResponse, publisherResponse)
 	}
 	return allPublisherResponse
+}
+
+func (publisherUsecase *PublisherUsecaseImpl) FindAllBookByPublisher(ctx *gin.Context, publisherID *int) response.PublisherResponse {
+	tx := publisherUsecase.DB.Begin()
+	defer helper.CommitOrRollback(tx)
+	publisherData := publisherUsecase.PublisherRepository.FindAllBookByPublisher(ctx, tx, publisherID)
+	return helper.ConvertToPublisherResponse(&publisherData)
 }
 
 func (publisherUsecase *PublisherUsecaseImpl) Create(ctx *gin.Context, publisherCreateRequest *publisher.CreateRequestPublisher) response.PublisherResponse {
@@ -66,40 +72,33 @@ func (publisherUsecase *PublisherUsecaseImpl) Create(ctx *gin.Context, publisher
 		},
 		CreatedAt: time.Now(),
 	}
-	err := publisherUsecase.PublisherRepository.Create(ctx.Request.Context(), tx, &newPublisher)
-	helper.CreateApiErrorIfError(ctx, err, 500, "Internal Server Error")
+	publisherUsecase.PublisherRepository.Create(ctx, tx, &newPublisher)
 	return helper.ConvertToPublisherResponse(&newPublisher)
 }
 
 func (publisherUsecase *PublisherUsecaseImpl) Update(ctx *gin.Context, publisherUpdateRequest *publisher.UpdateRequestPublisher) response.PublisherResponse {
 	tx := publisherUsecase.DB.Begin()
 	defer helper.CommitOrRollback(tx)
-	publisherData, err := publisherUsecase.PublisherRepository.FindByID(ctx.Request.Context(), tx, &publisherUpdateRequest.ID)
-	helper.CreateApiErrorIfError(ctx, err, 400, "Not Found")
+	publisherData := publisherUsecase.PublisherRepository.FindByID(ctx, tx, &publisherUpdateRequest.ID)
 	publisherData.Name = publisherUpdateRequest.Name
 	publisherData.Description = sql.NullString{
 		String: publisherUpdateRequest.Description,
 		Valid:  true,
 	}
-	err = publisherUsecase.PublisherRepository.Update(ctx.Request.Context(), tx, &publisherData)
-	helper.CreateApiErrorIfError(ctx, err, 500, "Internal Server Error")
+	publisherUsecase.PublisherRepository.Update(ctx, tx, &publisherData)
 	return helper.ConvertToPublisherResponse(&publisherData)
 }
 
 func (publisherUsecase *PublisherUsecaseImpl) Delete(ctx *gin.Context, publisherID *int) {
 	tx := publisherUsecase.DB.Begin()
 	defer helper.CommitOrRollback(tx)
-	_, err := publisherUsecase.PublisherRepository.FindByID(ctx.Request.Context(), tx, publisherID)
-	helper.CreateApiErrorIfError(ctx, err, 400, "Not Found")
-	err = publisherUsecase.PublisherRepository.Delete(ctx.Request.Context(), tx, publisherID)
-	helper.CreateApiErrorIfError(ctx, err, 400, "Not Found")
+	publisherUsecase.PublisherRepository.FindByID(ctx, tx, publisherID)
+	publisherUsecase.PublisherRepository.Delete(ctx, tx, publisherID)
 }
 
 func (publisherUsecase *PublisherUsecaseImpl) PermanentDelete(ctx *gin.Context, publisherID *int) {
 	tx := publisherUsecase.DB.Begin()
 	defer helper.CommitOrRollback(tx)
-	_, err := publisherUsecase.PublisherRepository.FindDeletedByID(ctx.Request.Context(), tx, publisherID)
-	helper.CreateApiErrorIfError(ctx, err, 400, "Not Found")
-	err = publisherUsecase.PublisherRepository.PermanentDelete(ctx.Request.Context(), tx, publisherID)
-	helper.CreateApiErrorIfError(ctx, err, 400, "Not Found")
+	publisherUsecase.PublisherRepository.FindDeletedByID(ctx, tx, publisherID)
+	publisherUsecase.PublisherRepository.PermanentDelete(ctx, tx, publisherID)
 }

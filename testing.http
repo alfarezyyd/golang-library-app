@@ -12,13 +12,13 @@ Accept: application/json
 Content-Type: application/json
 
 {
-  "publisher_id": 223,
+  "publisher_id": 3,
   "isbn": "09231323",
-  "title": "Bukuku ARU Bnget",
   "author": "Sarudi",
   "publication_year": "2004",
   "amount": 23,
-  "bookshelf": "A231"
+  "bookshelf": "A231",
+  "kinds_id": [3]
 }
 
 ### Edited book
@@ -47,6 +47,10 @@ Accept: application/json
 
 ### Get all deleted book
 GET http://localhost:3000/v1/books/deleted
+Accept: application/json
+
+### Find all book by kind
+GET http://localhost:3000/v1/books/kinds/16
 Accept: application/json
 
 ### Get all publisher
@@ -88,4 +92,49 @@ Accept: application/json
 
 ### Hard delete publisher
 DELETE http://localhost:3000/v1/publishers/delete/4
+Accept: application/json
+
+### Get all kinds
+GET http://localhost:3000/v1/kinds
+Accept: application/json
+
+### Get detail kinds
+GET http://localhost:3000/v1/kinds/3
+Accept: application/json
+
+### Create kinds
+POST http://localhost:3000/v1/kinds
+Accept: application/json
+Content-Type: application/json
+
+{
+  "name": "Drama",
+  "description": "Drama Facebook"
+}
+
+### Edited kinds
+PATCH http://localhost:3000/v1/kinds/1
+Accept: application/json
+Content-Type: application/json
+
+{
+  "id": 1,
+  "name": "Drama UPDATED",
+  "description": "Drama Facebook UPDATED"
+}
+
+### Delete kinds
+DELETE http://localhost:3000/v1/kinds/2
+Accept: application/json
+
+### Hard delete kinds
+DELETE http://localhost:3000/v1/kinds/delete/2
+Accept: application/json
+
+### Get all deleted kinds
+GET http://localhost:3000/v1/kinds/deleted
+Accept: application/json
+
+### Find all book by kind
+GET http://localhost:3000/v1/kinds/books/1
 Accept: application/json

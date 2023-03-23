@@ -23,7 +23,7 @@ func NewBookUsecaseImpl(bookRepository repository.BookRepository, DB *gorm.DB) *
 func (bookUsecase *BookUsecaseImpl) FindAll(ctx *gin.Context) []response.BookResponse {
 	tx := bookUsecase.DB.Begin()
 	defer helper.CommitOrRollback(tx)
-	allBook := bookUsecase.BookRepository.FindAll(ctx.Request.Context(), tx)
+	allBook := bookUsecase.BookRepository.FindAll(ctx, tx)
 	var allBookResponse []response.BookResponse
 	for _, bookData := range allBook {
 		bookResponse := helper.ConvertToBookResponse(&bookData)
@@ -32,18 +32,24 @@ func (bookUsecase *BookUsecaseImpl) FindAll(ctx *gin.Context) []response.BookRes
 	return allBookResponse
 }
 
-func (bookUsecase *BookUsecaseImpl) FindById(ctx *gin.Context, bookID *int) response.BookResponse {
+func (bookUsecase *BookUsecaseImpl) FindByID(ctx *gin.Context, bookID *int) response.BookResponse {
 	tx := bookUsecase.DB.Begin()
 	defer helper.CommitOrRollback(tx)
-	bookData, err := bookUsecase.BookRepository.FindByID(ctx.Request.Context(), tx, bookID)
-	helper.CreateApiErrorIfError(ctx, err, 400, "Not Found")
+	bookData := bookUsecase.BookRepository.FindByID(ctx, tx, bookID)
+	return helper.ConvertToBookResponse(&bookData)
+}
+
+func (bookUsecase *BookUsecaseImpl) FindAllKindByBook(ctx *gin.Context, bookID *int) response.BookResponse {
+	tx := bookUsecase.DB.Begin()
+	defer helper.CommitOrRollback(tx)
+	bookData := bookUsecase.BookRepository.FindAllKindByBook(ctx, tx, bookID)
 	return helper.ConvertToBookResponse(&bookData)
 }
 
 func (bookUsecase *BookUsecaseImpl) FindAllDeleted(ctx *gin.Context) []response.BookResponse {
 	tx := bookUsecase.DB.Begin()
 	defer helper.CommitOrRollback(tx)
-	allBook := bookUsecase.BookRepository.FindAllDeleted(ctx.Request.Context(), tx)
+	allBook := bookUsecase.BookRepository.FindAllDeleted(ctx, tx)
 	var allBookResponse []response.BookResponse
 	for _, bookData := range allBook {
 		bookResponse := helper.ConvertToBookResponse(&bookData)
@@ -54,7 +60,6 @@ func (bookUsecase *BookUsecaseImpl) FindAllDeleted(ctx *gin.Context) []response.
 
 func (bookUsecase *BookUsecaseImpl) Create(ctx *gin.Context, bookCreateRequest *book.CreateRequestBook) response.BookResponse {
 	tx := bookUsecase.DB.Begin()
-	defer helper.CommitOrRollback(tx)
 	newBook := domain.Book{
 		PublisherID:     bookCreateRequest.PublisherID,
 		ISBN:            bookCreateRequest.ISBN,
@@ -65,41 +70,39 @@ func (bookUsecase *BookUsecaseImpl) Create(ctx *gin.Context, bookCreateRequest *
 		Bookshelf:       bookCreateRequest.Bookshelf,
 		CreatedAt:       time.Now(),
 	}
-	err := bookUsecase.BookRepository.Create(ctx.Request.Context(), tx, &newBook)
-	helper.CreateApiErrorIfError(ctx, err, 500, "Internal Server Error")
+	bookUsecase.BookRepository.Create(ctx, tx, &newBook)
+	helper.CommitOrRollback(tx)
+	tx = bookUsecase.DB.Begin()
+	newBookIDInt := int(newBook.ID)
+	bookUsecase.BookRepository.CreateBookKinds(ctx, tx, &newBookIDInt, bookCreateRequest.KindsID)
+	defer helper.CommitOrRollback(tx)
 	return helper.ConvertToBookResponse(&newBook)
 }
 
 func (bookUsecase *BookUsecaseImpl) Update(ctx *gin.Context, bookUpdateRequest *book.UpdateRequestBook) response.BookResponse {
 	tx := bookUsecase.DB.Begin()
 	defer helper.CommitOrRollback(tx)
-	bookData, err := bookUsecase.BookRepository.FindByID(ctx.Request.Context(), tx, &bookUpdateRequest.ID)
-	helper.CreateApiErrorIfError(ctx, err, 400, "Not Found")
+	bookData := bookUsecase.BookRepository.FindByID(ctx, tx, &bookUpdateRequest.ID)
 	bookData.ISBN = bookUpdateRequest.ISBN
 	bookData.Title = bookUpdateRequest.Title
 	bookData.Author = bookUpdateRequest.Author
 	bookData.PublicationYear = bookUpdateRequest.PublicationYear
 	bookData.Amount = bookUpdateRequest.Amount
 	bookData.Bookshelf = bookUpdateRequest.Bookshelf
-	err = bookUsecase.BookRepository.Update(ctx.Request.Context(), tx, &bookData)
-	helper.CreateApiErrorIfError(ctx, err, 500, "Internal Server Error")
+	bookUsecase.BookRepository.Update(ctx, tx, &bookData)
 	return helper.ConvertToBookResponse(&bookData)
 }
 
 func (bookUsecase *BookUsecaseImpl) Delete(ctx *gin.Context, bookID *int) {
 	tx := bookUsecase.DB.Begin()
 	defer helper.CommitOrRollback(tx)
-	_, err := bookUsecase.BookRepository.FindByID(ctx.Request.Context(), tx, bookID)
-	helper.CreateApiErrorIfError(ctx, err, 400, "Not Found")
-	err = bookUsecase.BookRepository.Delete(ctx.Request.Context(), tx, bookID)
-	helper.CreateApiErrorIfError(ctx, err, 400, "Not Found")
+	bookUsecase.BookRepository.FindByID(ctx, tx, bookID)
+	bookUsecase.BookRepository.Delete(ctx, tx, bookID)
 }
 
 func (bookUsecase *BookUsecaseImpl) PermanentDelete(ctx *gin.Context, bookID *int) {
 	tx := bookUsecase.DB.Begin()
 	defer helper.CommitOrRollback(tx)
-	_, err := bookUsecase.BookRepository.FindDeletedByID(ctx.Request.Context(), tx, bookID)
-	helper.CreateApiErrorIfError(ctx, err, 400, "Not Found")
-	err = bookUsecase.BookRepository.PermanentDelete(ctx.Request.Context(), tx, bookID)
-	helper.CreateApiErrorIfError(ctx, err, 400, "Not Found")
+	bookUsecase.BookRepository.FindDeletedByID(ctx, tx, bookID)
+	bookUsecase.BookRepository.PermanentDelete(ctx, tx, bookID)
 }

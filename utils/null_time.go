@@ -18,14 +18,14 @@ func (n *NullTime) Scan(value interface{}) error {
 }
 
 // Value implements the driver Valuer interface.
-func (n NullTime) Value() (driver.Value, error) {
+func (n *NullTime) Value() (driver.Value, error) {
 	if !n.Valid {
 		return nil, nil
 	}
 	return n.Time, nil
 }
 
-func (n NullTime) MarshalJSON() ([]byte, error) {
+func (n *NullTime) MarshalJSON() ([]byte, error) {
 	if n.Valid {
 		return json.Marshal(n.Time)
 	}

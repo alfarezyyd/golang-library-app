@@ -11,7 +11,7 @@ type Kind struct {
 	Name        string         `gorm:"type:VARCHAR(35);NOT NULL"`
 	Description sql.NullString `gorm:"type:TEXT"`
 	CreatedAt   time.Time      `gorm:"default:CURRENT_TIMESTAMP()"`
-	UpdatedAt   time.Time
+	UpdatedAt   sql.NullTime
 	DeletedAt   gorm.DeletedAt `gorm:"index"`
-	Books       []*Book        `gorm:"many2many:books_kinds"`
+	Books       []Book         `gorm:"many2many:books_kinds"`
 }
