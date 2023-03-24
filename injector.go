@@ -61,7 +61,25 @@ var employeeSet = wire.NewSet(
 	wire.Bind(new(controller.EmployeeController), new(*controllerImpl.EmployeeControllerImpl)),
 )
 
-var allSet = wire.NewSet(bookSet, publisherSet, kindSet, visitorSet, employeeSet)
+var memberSet = wire.NewSet(
+	repositoryImpl.NewMemberRepositoryImpl,
+	wire.Bind(new(repository.MemberRepository), new(*repositoryImpl.MemberRepositoryImpl)),
+	usecaseImpl.NewMemberUsecaseImpl,
+	wire.Bind(new(usecase.MemberUsecase), new(*usecaseImpl.MemberUsecaseImpl)),
+	controllerImpl.NewMemberControllerImpl,
+	wire.Bind(new(controller.MemberController), new(*controllerImpl.MemberControllerImpl)),
+)
+
+var userSet = wire.NewSet(
+	repositoryImpl.NewUserRepositoryImpl,
+	wire.Bind(new(repository.UserRepository), new(*repositoryImpl.UserRepositoryImpl)),
+	usecaseImpl.NewUserUsecaseImpl,
+	wire.Bind(new(usecase.UserUsecase), new(*usecaseImpl.UserUsecaseImpl)),
+	controllerImpl.NewUserControllerImpl,
+	wire.Bind(new(controller.UserController), new(*controllerImpl.UserControllerImpl)),
+)
+
+var allSet = wire.NewSet(bookSet, publisherSet, kindSet, visitorSet, employeeSet, memberSet, userSet)
 
 func InitializedGinEngine(databaseSetup *gorm.DB) *gin.Engine {
 	wire.Build(app.NewRouter, allSet)

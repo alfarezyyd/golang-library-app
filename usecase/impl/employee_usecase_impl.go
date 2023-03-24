@@ -32,7 +32,7 @@ func (employeeUsecase *EmployeeUsecaseImpl) FindAll(ctx *gin.Context) []response
 	return allEmployeeResponse
 }
 
-func (employeeUsecase *EmployeeUsecaseImpl) FindById(ctx *gin.Context, employeeID *int) response.EmployeeResponse {
+func (employeeUsecase *EmployeeUsecaseImpl) FindByID(ctx *gin.Context, employeeID *int) response.EmployeeResponse {
 	tx := employeeUsecase.DB.Begin()
 	defer helper.CommitOrRollback(tx)
 	employeeData := employeeUsecase.EmployeeRepository.FindByID(ctx, tx, employeeID)

@@ -29,7 +29,7 @@ func (employeeController *EmployeeControllerImpl) FindByID(ctx *gin.Context) {
 	if err != nil {
 		return
 	}
-	dataEmployee := employeeController.employeeUsecase.FindById(ctx, &employeeIdInt)
+	dataEmployee := employeeController.employeeUsecase.FindByID(ctx, &employeeIdInt)
 	helper.WriteToWebResponse(ctx, dataEmployee)
 }
 

@@ -10,7 +10,9 @@ func NewRouter(
 	kindController controller.KindController,
 	publisherController controller.PublisherController,
 	visitorController controller.VisitorController,
-	employeeController controller.EmployeeController) *gin.Engine {
+	employeeController controller.EmployeeController,
+	memberController controller.MemberController,
+	userController controller.UserController) *gin.Engine {
 	ginEngine := gin.New()
 	ginEngine.Use(gin.Recovery())
 	v1API := ginEngine.Group("/v1")
@@ -63,5 +65,22 @@ func NewRouter(
 	v1API.DELETE("/employees/:id", employeeController.Delete)
 	v1API.DELETE("/employees/delete/:id", employeeController.PermanentDelete)
 
+	// Member API
+	v1API.GET("/members", memberController.FindAll)
+	v1API.GET("/members/:id", memberController.FindByID)
+	v1API.GET("/members/deleted", memberController.FindAllDeleted)
+	v1API.POST("/members", memberController.Create)
+	v1API.PATCH("/members/:id", memberController.Update)
+	v1API.DELETE("/members/:id", memberController.Delete)
+	v1API.DELETE("/members/delete/:id", memberController.PermanentDelete)
+
+	// User API
+	v1API.GET("/users", userController.FindAll)
+	v1API.GET("/users/:id", userController.FindByID)
+	v1API.GET("/users/deleted", userController.FindAllDeleted)
+	v1API.POST("/users", userController.Create)
+	v1API.PATCH("/users/:id", userController.Update)
+	v1API.DELETE("/users/:id", userController.Delete)
+	v1API.DELETE("/users/delete/:id", userController.PermanentDelete)
 	return ginEngine
 }

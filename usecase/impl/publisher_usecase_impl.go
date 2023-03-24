@@ -35,7 +35,7 @@ func (publisherUsecase *PublisherUsecaseImpl) FindAll(ctx *gin.Context) []respon
 	return allPublisherResponse
 }
 
-func (publisherUsecase *PublisherUsecaseImpl) FindById(ctx *gin.Context, publisherID *int) response.PublisherResponse {
+func (publisherUsecase *PublisherUsecaseImpl) FindByID(ctx *gin.Context, publisherID *int) response.PublisherResponse {
 	tx := publisherUsecase.DB.Begin()
 	defer helper.CommitOrRollback(tx)
 	publisherData := publisherUsecase.PublisherRepository.FindByID(ctx, tx, publisherID)

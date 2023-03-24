@@ -7,16 +7,16 @@ import (
 )
 
 type BookResponse struct {
-	ID              int             `json:"id,omitempty"`
-	PublisherID     int             `json:"publisher_id,omitempty"`
-	ISBN            string          `json:"isbn,omitempty"`
-	Title           string          `json:"title,omitempty"`
-	Author          string          `json:"author,omitempty"`
-	PublicationYear string          `json:"publication_year,omitempty"`
-	Amount          int             `json:"amount,omitempty"`
-	Bookshelf       string          `json:"bookshelf,omitempty"`
-	CreatedAt       *time.Time      `json:"created_at,omitempty"`
-	UpdatedAt       *utils.NullTime `json:"updated_at,omitempty"`
-	DeletedAt       *gorm.DeletedAt `json:"deleted_at,omitempty"`
+	ID              int             `json:"id"`
+	PublisherID     int             `json:"publisher_id"`
+	ISBN            string          `json:"isbn"`
+	Title           string          `json:"title"`
+	Author          string          `json:"author"`
+	PublicationYear string          `json:"publication_year"`
+	Amount          int             `json:"amount"`
+	Bookshelf       string          `json:"bookshelf"`
+	CreatedAt       *time.Time      `json:"created_at"`
+	UpdatedAt       *utils.NullTime `json:"updated_at"`
+	DeletedAt       *gorm.DeletedAt `json:"deleted_at"`
 	Kinds           []KindResponse  `json:"kinds"`
 }

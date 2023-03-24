@@ -34,7 +34,7 @@ func (kindUsecase *KindUsecaseImpl) FindAll(ctx *gin.Context) []response.KindRes
 	return allKindResponse
 }
 
-func (kindUsecase *KindUsecaseImpl) FindById(ctx *gin.Context, kindID *int) response.KindResponse {
+func (kindUsecase *KindUsecaseImpl) FindByID(ctx *gin.Context, kindID *int) response.KindResponse {
 	tx := kindUsecase.DB.Begin()
 	defer helper.CommitOrRollback(tx)
 	kindData := kindUsecase.KindRepository.FindByID(ctx, tx, kindID)

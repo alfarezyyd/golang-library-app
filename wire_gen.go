@@ -34,7 +34,16 @@ func InitializedGinEngine(databaseSetup *gorm.DB) *gin.Engine {
 	visitorRepositoryImpl := impl.NewVisitorRepositoryImpl()
 	visitorUsecaseImpl := impl2.NewVisitorUsecaseImpl(visitorRepositoryImpl, databaseSetup)
 	visitorControllerImpl := impl3.NewVisitorControllerImpl(visitorUsecaseImpl)
-	engine := app.NewRouter(bookControllerImpl, kindControllerImpl, publisherControllerImpl, visitorControllerImpl)
+	employeeRepositoryImpl := impl.NewEmployeeRepositoryImpl()
+	employeeUsecaseImpl := impl2.NewEmployeeUsecaseImpl(employeeRepositoryImpl, databaseSetup)
+	employeeControllerImpl := impl3.NewEmployeeControllerImpl(employeeUsecaseImpl)
+	memberRepositoryImpl := impl.NewMemberRepositoryImpl()
+	memberUsecaseImpl := impl2.NewMemberUsecaseImpl(memberRepositoryImpl, databaseSetup)
+	memberControllerImpl := impl3.NewMemberControllerImpl(memberUsecaseImpl)
+	userRepositoryImpl := impl.NewUserRepositoryImpl()
+	userUsecaseImpl := impl2.NewUserUsecaseImpl(userRepositoryImpl, databaseSetup)
+	userControllerImpl := impl3.NewUserControllerImpl(userUsecaseImpl)
+	engine := app.NewRouter(bookControllerImpl, kindControllerImpl, publisherControllerImpl, visitorControllerImpl, employeeControllerImpl, memberControllerImpl, userControllerImpl)
 	return engine
 }
 
@@ -48,4 +57,10 @@ var kindSet = wire.NewSet(impl.NewKindRepositoryImpl, wire.Bind(new(repository.K
 
 var visitorSet = wire.NewSet(impl.NewVisitorRepositoryImpl, wire.Bind(new(repository.VisitorRepository), new(*impl.VisitorRepositoryImpl)), impl2.NewVisitorUsecaseImpl, wire.Bind(new(usecase.VisitorUsecase), new(*impl2.VisitorUsecaseImpl)), impl3.NewVisitorControllerImpl, wire.Bind(new(controller.VisitorController), new(*impl3.VisitorControllerImpl)))
 
-var allSet = wire.NewSet(bookSet, publisherSet, kindSet, visitorSet)
+var employeeSet = wire.NewSet(impl.NewEmployeeRepositoryImpl, wire.Bind(new(repository.EmployeeRepository), new(*impl.EmployeeRepositoryImpl)), impl2.NewEmployeeUsecaseImpl, wire.Bind(new(usecase.EmployeeUsecase), new(*impl2.EmployeeUsecaseImpl)), impl3.NewEmployeeControllerImpl, wire.Bind(new(controller.EmployeeController), new(*impl3.EmployeeControllerImpl)))
+
+var memberSet = wire.NewSet(impl.NewMemberRepositoryImpl, wire.Bind(new(repository.MemberRepository), new(*impl.MemberRepositoryImpl)), impl2.NewMemberUsecaseImpl, wire.Bind(new(usecase.MemberUsecase), new(*impl2.MemberUsecaseImpl)), impl3.NewMemberControllerImpl, wire.Bind(new(controller.MemberController), new(*impl3.MemberControllerImpl)))
+
+var userSet = wire.NewSet(impl.NewUserRepositoryImpl, wire.Bind(new(repository.UserRepository), new(*impl.UserRepositoryImpl)), impl2.NewUserUsecaseImpl, wire.Bind(new(usecase.UserUsecase), new(*impl2.UserUsecaseImpl)), impl3.NewUserControllerImpl, wire.Bind(new(controller.UserController), new(*impl3.UserControllerImpl)))
+
+var allSet = wire.NewSet(bookSet, publisherSet, kindSet, visitorSet, employeeSet, memberSet, userSet)

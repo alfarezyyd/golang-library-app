@@ -32,7 +32,7 @@ func (visitorUsecase *VisitorUsecaseImpl) FindAll(ctx *gin.Context) []response.V
 	return allVisitorResponse
 }
 
-func (visitorUsecase *VisitorUsecaseImpl) FindById(ctx *gin.Context, visitorID *int) response.VisitorResponse {
+func (visitorUsecase *VisitorUsecaseImpl) FindByID(ctx *gin.Context, visitorID *int) response.VisitorResponse {
 	tx := visitorUsecase.DB.Begin()
 	defer helper.CommitOrRollback(tx)
 	visitorData := visitorUsecase.VisitorRepository.FindByID(ctx, tx, visitorID)

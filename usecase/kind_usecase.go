@@ -8,7 +8,7 @@ import (
 
 type KindUsecase interface {
 	FindAll(ctx *gin.Context) []response.KindResponse
-	FindById(ctx *gin.Context, kindID *int) response.KindResponse
+	FindByID(ctx *gin.Context, kindID *int) response.KindResponse
 	FindAllDeleted(ctx *gin.Context) []response.KindResponse
 	FindAllBookByKind(ctx *gin.Context, kindID *int) response.KindResponse
 	DeleteBookByKind(ctx *gin.Context, kindID *int, bookID *int)

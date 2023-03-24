@@ -8,10 +8,6 @@ import (
 )
 
 func ConvertToBookResponse(domainBook *domain.Book) response.BookResponse {
-	correctTime := utils.NullTime{
-		Time:  domainBook.UpdatedAt.Time,
-		Valid: domainBook.UpdatedAt.Valid,
-	}
 	var allKindResponse []response.KindResponse
 	for _, domainKind := range domainBook.Kinds {
 		kindResponse := ConvertToKindResponse(&domainKind)
@@ -28,9 +24,12 @@ func ConvertToBookResponse(domainBook *domain.Book) response.BookResponse {
 		Amount:          domainBook.Amount,
 		Bookshelf:       domainBook.Bookshelf,
 		CreatedAt:       &domainBook.CreatedAt,
-		UpdatedAt:       &correctTime,
-		DeletedAt:       &domainBook.DeletedAt,
-		Kinds:           allKindResponse,
+		UpdatedAt: &utils.NullTime{
+			Time:  domainBook.UpdatedAt.Time,
+			Valid: domainBook.UpdatedAt.Valid,
+		},
+		DeletedAt: &domainBook.DeletedAt,
+		Kinds:     allKindResponse,
 	}
 }
 
@@ -86,12 +85,12 @@ func ConvertToVisitorResponse(domainVisitor *domain.Visitor) response.VisitorRes
 		NIN:       domainVisitor.NIN,
 		Name:      domainVisitor.Name,
 		Instance:  domainVisitor.Instance,
-		CreatedAt: domainVisitor.CreatedAt,
-		UpdatedAt: utils.NullTime{
+		CreatedAt: &domainVisitor.CreatedAt,
+		UpdatedAt: &utils.NullTime{
 			Time:  domainVisitor.UpdatedAt.Time,
-			Valid: true,
+			Valid: domainVisitor.UpdatedAt.Valid,
 		},
-		DeletedAt: domainVisitor.DeletedAt,
+		DeletedAt: &domainVisitor.DeletedAt,
 	}
 }
 
@@ -103,11 +102,50 @@ func ConvertToEmployeeResponse(domainEmployee *domain.Employee) response.Employe
 		Position:        domainEmployee.Position,
 		TelephoneNumber: domainEmployee.TelephoneNumber,
 		Address:         domainEmployee.Address,
-		CreatedAt:       domainEmployee.CreatedAt,
-		UpdatedAt: utils.NullTime{
+		CreatedAt:       &domainEmployee.CreatedAt,
+		UpdatedAt: &utils.NullTime{
 			Time:  domainEmployee.UpdatedAt.Time,
-			Valid: true,
+			Valid: domainEmployee.UpdatedAt.Valid,
 		},
-		DeletedAt: domainEmployee.DeletedAt,
+		DeletedAt: &domainEmployee.DeletedAt,
+	}
+}
+
+func ConvertToMemberResponse(domainMember *domain.Member) response.MemberResponse {
+	return response.MemberResponse{
+		ID:              domainMember.ID,
+		NIN:             domainMember.NIN,
+		Name:            domainMember.Name,
+		BirthPlace:      domainMember.BirthPlace,
+		BirthDate:       &domainMember.BirthDate,
+		Address:         domainMember.Address,
+		Gender:          domainMember.Gender,
+		TelephoneNumber: domainMember.TelephoneNumber,
+		CreatedAt:       &domainMember.CreatedAt,
+		UpdatedAt: &utils.NullTime{
+			Time:  domainMember.UpdatedAt.Time,
+			Valid: domainMember.UpdatedAt.Valid,
+		},
+		DeletedAt: &domainMember.DeletedAt,
+	}
+}
+
+func ConvertToUserResponse(domainUser *domain.User) response.UserResponse {
+	return response.UserResponse{
+		ID:       domainUser.ID,
+		MemberID: domainUser.MemberID,
+		Username: domainUser.Username,
+		Email:    domainUser.Email,
+		Password: domainUser.Password,
+		EmailVerifiedAt: &utils.NullTime{
+			Time:  domainUser.EmailVerifiedAt.Time,
+			Valid: domainUser.EmailVerifiedAt.Valid,
+		},
+		CreatedAt: &domainUser.CreatedAt,
+		UpdatedAt: &utils.NullTime{
+			Time:  domainUser.UpdatedAt.Time,
+			Valid: domainUser.UpdatedAt.Valid,
+		},
+		DeletedAt: &domainUser.DeletedAt,
 	}
 }

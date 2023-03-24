@@ -29,7 +29,7 @@ func (visitorController *VisitorControllerImpl) FindByID(ctx *gin.Context) {
 	if err != nil {
 		return
 	}
-	dataVisitor := visitorController.visitorUsecase.FindById(ctx, &visitorIdInt)
+	dataVisitor := visitorController.visitorUsecase.FindByID(ctx, &visitorIdInt)
 	helper.WriteToWebResponse(ctx, dataVisitor)
 }
 

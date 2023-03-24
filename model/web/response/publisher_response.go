@@ -7,11 +7,11 @@ import (
 )
 
 type PublisherResponse struct {
-	ID          int             `json:"id,omitempty"`
-	Name        string          `json:"name,omitempty"`
-	Description string          `json:"description,omitempty"`
-	CreatedAt   *time.Time      `json:"created_at,omitempty"`
-	UpdatedAt   *utils.NullTime `json:"updated_at,omitempty"`
-	DeletedAt   *gorm.DeletedAt `json:"deleted_at,omitempty"`
-	BooksData   []BookResponse  `json:"books_data,omitempty"`
+	ID          int             `json:"id"`
+	Name        string          `json:"name"`
+	Description string          `json:"description"`
+	CreatedAt   *time.Time      `json:"created_at"`
+	UpdatedAt   *utils.NullTime `json:"updated_at"`
+	DeletedAt   *gorm.DeletedAt `json:"deleted_at"`
+	BooksData   []BookResponse  `json:"books_data"`
 }

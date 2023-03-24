@@ -143,3 +143,45 @@ Accept: application/json
 ### Delete book by kind
 DELETE http://localhost:3000/v1/kinds/books/3/2
 Accept: application/json
+
+### Get all members
+GET http://localhost:3000/v1/members
+Accept: application/json
+
+### Get detail members
+GET http://localhost:3000/v1/members/3
+Accept: application/json
+
+### Create members
+POST http://localhost:3000/v1/members
+Accept: application/json
+Content-Type: application/json
+
+{
+  "nin": "32312231231",
+  "name": "Budi Sarudi",
+  "birth_place": "Jakarta",
+  "birth_date": "12-12-22",
+  "address": "Jl. Jambu RT. 23 RW. 21 Kp. Mangga",
+  "gender": "Man",
+  "telephone_number": "088239932832"
+}
+
+### Edited members
+PATCH http://localhost:3000/v1/members/1
+Accept: application/json
+Content-Type: application/json
+
+{
+  "id": 1,
+  "name": "Drama UPDATED",
+  "description": "Drama Facebook UPDATED"
+}
+
+### Delete members
+DELETE http://localhost:3000/v1/members/2
+Accept: application/json
+
+### Hard delete members
+DELETE http://localhost:3000/v1/members/delete/2
+Accept: application/json

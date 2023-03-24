@@ -29,7 +29,7 @@ func (publisherController *PublisherControllerImpl) FindByID(ctx *gin.Context) {
 	if err != nil {
 		return
 	}
-	dataPublisher := publisherController.publisherUsecase.FindById(ctx, &publisherIdInt)
+	dataPublisher := publisherController.publisherUsecase.FindByID(ctx, &publisherIdInt)
 	helper.WriteToWebResponse(ctx, dataPublisher)
 }
 

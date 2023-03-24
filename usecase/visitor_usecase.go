@@ -8,7 +8,7 @@ import (
 
 type VisitorUsecase interface {
 	FindAll(ctx *gin.Context) []response.VisitorResponse
-	FindById(ctx *gin.Context, visitorID *int) response.VisitorResponse
+	FindByID(ctx *gin.Context, visitorID *int) response.VisitorResponse
 	FindAllDeleted(ctx *gin.Context) []response.VisitorResponse
 	Create(ctx *gin.Context, visitorCreateRequest *visitor.CreateRequestVisitor) response.VisitorResponse
 	Update(ctx *gin.Context, visitorUpdateRequest *visitor.UpdateRequestVisitor) response.VisitorResponse

@@ -28,7 +28,7 @@ func (kindController *KindControllerImpl) FindByID(ctx *gin.Context) {
 	if err != nil {
 		return
 	}
-	dataPublisher := kindController.kindUsecase.FindById(ctx, &kindIdInt)
+	dataPublisher := kindController.kindUsecase.FindByID(ctx, &kindIdInt)
 	helper.WriteToWebResponse(ctx, dataPublisher)
 }
 
