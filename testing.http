@@ -14,11 +14,12 @@ Content-Type: application/json
 {
   "publisher_id": 3,
   "isbn": "09231323",
+  "title": "Budi Man",
   "author": "Sarudi",
   "publication_year": "2004",
   "amount": 23,
   "bookshelf": "A231",
-  "kinds_id": [3]
+  "kinds_id": [3,5,2]
 }
 
 ### Edited book
@@ -137,4 +138,8 @@ Accept: application/json
 
 ### Find all book by kind
 GET http://localhost:3000/v1/kinds/books/1
+Accept: application/json
+
+### Delete book by kind
+DELETE http://localhost:3000/v1/kinds/books/3/2
 Accept: application/json

@@ -7,6 +7,6 @@ import (
 )
 
 func RunMigration(db *gorm.DB) {
-	err := db.AutoMigrate(&domain.Publisher{}, &domain.Book{})
+	err := db.AutoMigrate(&domain.Publisher{}, &domain.Book{}, &domain.Kind{}, &domain.Visitor{}, &domain.Employee{})
 	helper.LogFatalIfError(err)
 }

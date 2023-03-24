@@ -48,6 +48,23 @@ func (kindController *KindControllerImpl) FindAllBookByKind(ctx *gin.Context) {
 	helper.WriteToWebResponse(ctx, kindData)
 }
 
+func (kindController *KindControllerImpl) DeleteBookByKind(ctx *gin.Context) {
+	bookIdString := ctx.Param("book_id")
+	kindIdString := ctx.Param("kind_id")
+	bookIdInt, err := strconv.Atoi(bookIdString)
+	err = helper.CheckBadRequestError(ctx, err)
+	if err != nil {
+		return
+	}
+	kindIdInt, err := strconv.Atoi(kindIdString)
+	err = helper.CheckBadRequestError(ctx, err)
+	if err != nil {
+		return
+	}
+	kindController.kindUsecase.DeleteBookByKind(ctx, &kindIdInt, &bookIdInt)
+	helper.WriteToWebResponse(ctx, nil)
+}
+
 func (kindController *KindControllerImpl) Create(ctx *gin.Context) {
 	var createKindRequest kind.CreateRequestKind
 	err := ctx.ShouldBindJSON(&createKindRequest)

@@ -14,11 +14,12 @@ import (
 
 type KindUsecaseImpl struct {
 	KindRepository repository.KindRepository
+	BookRepository repository.BookRepository
 	DB             *gorm.DB
 }
 
-func NewKindUsecaseImpl(kindRepository repository.KindRepository, DB *gorm.DB) *KindUsecaseImpl {
-	return &KindUsecaseImpl{KindRepository: kindRepository, DB: DB}
+func NewKindUsecaseImpl(kindRepository repository.KindRepository, bookRepository repository.BookRepository, DB *gorm.DB) *KindUsecaseImpl {
+	return &KindUsecaseImpl{KindRepository: kindRepository, BookRepository: bookRepository, DB: DB}
 }
 
 func (kindUsecase *KindUsecaseImpl) FindAll(ctx *gin.Context) []response.KindResponse {
@@ -58,6 +59,14 @@ func (kindUsecase *KindUsecaseImpl) FindAllBookByKind(ctx *gin.Context, kindID *
 	defer helper.CommitOrRollback(tx)
 	kindData := kindUsecase.KindRepository.FindAllBookByKind(ctx, tx, kindID)
 	return helper.ConvertToKindResponse(&kindData)
+}
+
+func (kindUsecase *KindUsecaseImpl) DeleteBookByKind(ctx *gin.Context, kindID *int, bookID *int) {
+	tx := kindUsecase.DB.Begin()
+	defer helper.CommitOrRollback(tx)
+	kindUsecase.KindRepository.FindByID(ctx, tx, kindID)
+	kindUsecase.BookRepository.FindByID(ctx, tx, bookID)
+	kindUsecase.KindRepository.DeleteBookByKind(ctx, tx, kindID, bookID)
 }
 
 func (kindUsecase *KindUsecaseImpl) Create(ctx *gin.Context, kindCreateRequest *kind.CreateRequestKind) response.KindResponse {

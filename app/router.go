@@ -5,13 +5,12 @@ import (
 	"golang-library-app/controller"
 )
 
-type (
-	BookController      controller.BookController
-	KindController      controller.KindController
-	PublisherController controller.PublisherController
-)
-
-func NewRouter(bookController BookController, kindController KindController, publisherController PublisherController) *gin.Engine {
+func NewRouter(
+	bookController controller.BookController,
+	kindController controller.KindController,
+	publisherController controller.PublisherController,
+	visitorController controller.VisitorController,
+	employeeController controller.EmployeeController) *gin.Engine {
 	ginEngine := gin.New()
 	ginEngine.Use(gin.Recovery())
 	v1API := ginEngine.Group("/v1")
@@ -44,5 +43,25 @@ func NewRouter(bookController BookController, kindController KindController, pub
 	v1API.PATCH("/kinds/:id", kindController.Update)
 	v1API.DELETE("/kinds/:id", kindController.Delete)
 	v1API.DELETE("/kinds/delete/:id", kindController.PermanentDelete)
+	v1API.DELETE("/kinds/books/:kind_id/:book_id", kindController.DeleteBookByKind)
+
+	// Visitor API
+	v1API.GET("/visitors", visitorController.FindAll)
+	v1API.GET("/visitors/:id", visitorController.FindByID)
+	v1API.GET("/visitors/deleted", visitorController.FindAllDeleted)
+	v1API.POST("/visitors", visitorController.Create)
+	v1API.PATCH("/visitors/:id", visitorController.Update)
+	v1API.DELETE("/visitors/:id", visitorController.Delete)
+	v1API.DELETE("/visitors/delete/:id", visitorController.PermanentDelete)
+
+	// Employee API
+	v1API.GET("/employees", employeeController.FindAll)
+	v1API.GET("/employees/:id", employeeController.FindByID)
+	v1API.GET("/employees/deleted", employeeController.FindAllDeleted)
+	v1API.POST("/employees", employeeController.Create)
+	v1API.PATCH("/employees/:id", employeeController.Update)
+	v1API.DELETE("/employees/:id", employeeController.Delete)
+	v1API.DELETE("/employees/delete/:id", employeeController.PermanentDelete)
+
 	return ginEngine
 }

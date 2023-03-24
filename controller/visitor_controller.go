@@ -2,12 +2,10 @@ package controller
 
 import "github.com/gin-gonic/gin"
 
-type KindController interface {
+type VisitorController interface {
 	FindAll(ctx *gin.Context)
 	FindByID(ctx *gin.Context)
 	FindAllDeleted(ctx *gin.Context)
-	FindAllBookByKind(ctx *gin.Context)
-	DeleteBookByKind(ctx *gin.Context)
 	Create(ctx *gin.Context)
 	Update(ctx *gin.Context)
 	Delete(ctx *gin.Context)

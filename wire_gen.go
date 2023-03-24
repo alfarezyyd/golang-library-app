@@ -26,23 +26,26 @@ func InitializedGinEngine(databaseSetup *gorm.DB) *gin.Engine {
 	bookUsecaseImpl := impl2.NewBookUsecaseImpl(bookRepositoryImpl, databaseSetup)
 	bookControllerImpl := impl3.NewBookControllerImpl(bookUsecaseImpl)
 	kindRepositoryImpl := impl.NewKindRepositoryImpl()
-	kindUsecaseImpl := impl2.NewKindUsecaseImpl(kindRepositoryImpl, databaseSetup)
+	kindUsecaseImpl := impl2.NewKindUsecaseImpl(kindRepositoryImpl, bookRepositoryImpl, databaseSetup)
 	kindControllerImpl := impl3.NewKindControllerImpl(kindUsecaseImpl)
 	publisherRepositoryImpl := impl.NewPublisherRepositoryImpl()
 	publisherUsecaseImpl := impl2.NewPublisherUsecaseImpl(publisherRepositoryImpl, databaseSetup)
 	publisherControllerImpl := impl3.NewPublisherControllerImpl(publisherUsecaseImpl)
-	engine := app.NewRouter(bookControllerImpl, kindControllerImpl, publisherControllerImpl)
+	visitorRepositoryImpl := impl.NewVisitorRepositoryImpl()
+	visitorUsecaseImpl := impl2.NewVisitorUsecaseImpl(visitorRepositoryImpl, databaseSetup)
+	visitorControllerImpl := impl3.NewVisitorControllerImpl(visitorUsecaseImpl)
+	engine := app.NewRouter(bookControllerImpl, kindControllerImpl, publisherControllerImpl, visitorControllerImpl)
 	return engine
 }
 
 // injector.go:
 
-var bookSet = wire.NewSet(impl.NewBookRepositoryImpl, wire.Bind(new(repository.BookRepository), new(*impl.BookRepositoryImpl)), impl2.NewBookUsecaseImpl, wire.Bind(new(usecase.BookUsecase), new(*impl2.BookUsecaseImpl)), impl3.NewBookControllerImpl, wire.Bind(new(app.BookController), new(*impl3.BookControllerImpl)))
+var bookSet = wire.NewSet(impl.NewBookRepositoryImpl, wire.Bind(new(repository.BookRepository), new(*impl.BookRepositoryImpl)), impl2.NewBookUsecaseImpl, wire.Bind(new(usecase.BookUsecase), new(*impl2.BookUsecaseImpl)), impl3.NewBookControllerImpl, wire.Bind(new(controller.BookController), new(*impl3.BookControllerImpl)))
 
 var publisherSet = wire.NewSet(impl.NewPublisherRepositoryImpl, wire.Bind(new(repository.PublisherRepository), new(*impl.PublisherRepositoryImpl)), impl2.NewPublisherUsecaseImpl, wire.Bind(new(usecase.PublisherUsecase), new(*impl2.PublisherUsecaseImpl)), impl3.NewPublisherControllerImpl, wire.Bind(new(controller.PublisherController), new(*impl3.PublisherControllerImpl)))
 
-var kindSet = wire.NewSet(impl.NewKindRepositoryImpl, wire.Bind(new(repository.KindRepository), new(*impl.KindRepositoryImpl)), impl2.NewKindUsecaseImpl, wire.Bind(new(usecase.KindUsecase), new(*impl2.KindUsecaseImpl)), impl3.NewKindControllerImpl, wire.Bind(new(app.KindController), new(*impl3.KindControllerImpl)))
+var kindSet = wire.NewSet(impl.NewKindRepositoryImpl, wire.Bind(new(repository.KindRepository), new(*impl.KindRepositoryImpl)), impl2.NewKindUsecaseImpl, wire.Bind(new(usecase.KindUsecase), new(*impl2.KindUsecaseImpl)), impl3.NewKindControllerImpl, wire.Bind(new(controller.KindController), new(*impl3.KindControllerImpl)))
 
-var allSet = wire.NewSet(
-	bookSet, publisherSet, kindSet,
-)
+var visitorSet = wire.NewSet(impl.NewVisitorRepositoryImpl, wire.Bind(new(repository.VisitorRepository), new(*impl.VisitorRepositoryImpl)), impl2.NewVisitorUsecaseImpl, wire.Bind(new(usecase.VisitorUsecase), new(*impl2.VisitorUsecaseImpl)), impl3.NewVisitorControllerImpl, wire.Bind(new(controller.VisitorController), new(*impl3.VisitorControllerImpl)))
+
+var allSet = wire.NewSet(bookSet, publisherSet, kindSet, visitorSet)

@@ -81,7 +81,6 @@ func (bookUsecase *BookUsecaseImpl) Create(ctx *gin.Context, bookCreateRequest *
 
 func (bookUsecase *BookUsecaseImpl) Update(ctx *gin.Context, bookUpdateRequest *book.UpdateRequestBook) response.BookResponse {
 	tx := bookUsecase.DB.Begin()
-	defer helper.CommitOrRollback(tx)
 	bookData := bookUsecase.BookRepository.FindByID(ctx, tx, &bookUpdateRequest.ID)
 	bookData.ISBN = bookUpdateRequest.ISBN
 	bookData.Title = bookUpdateRequest.Title
@@ -90,6 +89,11 @@ func (bookUsecase *BookUsecaseImpl) Update(ctx *gin.Context, bookUpdateRequest *
 	bookData.Amount = bookUpdateRequest.Amount
 	bookData.Bookshelf = bookUpdateRequest.Bookshelf
 	bookUsecase.BookRepository.Update(ctx, tx, &bookData)
+	bookUsecase.BookRepository.DeleteAllKindByBook(ctx, tx, &bookUpdateRequest.ID)
+	helper.CommitOrRollback(tx)
+	tx = bookUsecase.DB.Begin()
+	bookUsecase.BookRepository.CreateBookKinds(ctx, tx, &bookUpdateRequest.ID, bookUpdateRequest.KindsID)
+	helper.CommitOrRollback(tx)
 	return helper.ConvertToBookResponse(&bookData)
 }
 

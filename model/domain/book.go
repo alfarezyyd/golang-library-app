@@ -7,13 +7,13 @@ import (
 )
 
 type Book struct {
-	ID              uint `gorm:"primaryKey;autoIncrement"`
-	PublisherID     uint
+	ID              int `gorm:"primaryKey;autoIncrement"`
+	PublisherID     int
 	ISBN            string    `gorm:"type:VARCHAR(30);NOT NULL"`
 	Title           string    `gorm:"type:VARCHAR(50);NOT NULL"`
 	Author          string    `gorm:"type:VARCHAR(50);NOT NULL"`
 	PublicationYear string    `gorm:"type:VARCHAR(4);NOT NULL"`
-	Amount          uint      `gorm:"type:INT(11);NOT NULL"`
+	Amount          int       `gorm:"type:INT(11);NOT NULL"`
 	Bookshelf       string    `gorm:"type:VARCHAR(10);NOT NULL"`
 	CreatedAt       time.Time `gorm:"default:CURRENT_TIMESTAMP()"`
 	UpdatedAt       sql.NullTime

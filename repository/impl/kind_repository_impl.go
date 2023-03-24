@@ -60,6 +60,11 @@ func (kindRepository *KindRepositoryImpl) FindAllBookByKind(ctx *gin.Context, tx
 	return kindData
 }
 
+func (kindRepository *KindRepositoryImpl) DeleteBookByKind(ctx *gin.Context, tx *gorm.DB, kindID *int, bookID *int) {
+	resultManipulation := tx.WithContext(ctx.Request.Context()).Exec("DELETE FROM books_kinds WHERE book_id = ? AND kind_id = ?", bookID, kindID)
+	helper.CheckInternalServerError(ctx, resultManipulation.Error)
+}
+
 func (kindRepository *KindRepositoryImpl) Create(ctx *gin.Context, tx *gorm.DB, domainData *domain.Kind) {
 	resultManipulation := tx.WithContext(ctx.Request.Context()).Omit("updated_at").Create(&domainData)
 	helper.CheckInternalServerError(ctx, resultManipulation.Error)
@@ -71,9 +76,13 @@ func (kindRepository *KindRepositoryImpl) Update(ctx *gin.Context, tx *gorm.DB, 
 }
 
 func (kindRepository *KindRepositoryImpl) Delete(ctx *gin.Context, tx *gorm.DB, kindID *int) {
-	tx.WithContext(ctx.Request.Context()).Debug().Delete(&domain.Kind{}, kindID)
+	resultSql := tx.WithContext(ctx.Request.Context()).Debug().Delete(&domain.Kind{}, kindID)
+	helper.CheckInternalServerError(ctx, resultSql.Error)
+
 }
 
 func (kindRepository *KindRepositoryImpl) PermanentDelete(ctx *gin.Context, tx *gorm.DB, kindID *int) {
-	tx.WithContext(ctx.Request.Context()).Unscoped().Delete(&domain.Kind{}, kindID)
+	resultSql := tx.WithContext(ctx.Request.Context()).Unscoped().Delete(&domain.Kind{}, kindID)
+	helper.CheckInternalServerError(ctx, resultSql.Error)
+
 }

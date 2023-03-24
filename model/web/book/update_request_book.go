@@ -7,7 +7,7 @@ type UpdateRequestBook struct {
 	Title           string `json:"title,omitempty"`
 	Author          string `json:"author,omitempty"`
 	PublicationYear string `json:"publication_year,omitempty"`
-	Amount          uint   `json:"amount,omitempty"`
+	Amount          int    `json:"amount,omitempty"`
 	Bookshelf       string `json:"bookshelf,omitempty"`
-	//Kinds
+	KindsID         []int  `json:"kinds_id"`
 }

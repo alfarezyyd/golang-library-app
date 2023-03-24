@@ -79,3 +79,35 @@ func ConvertToKindResponse(domainKind *domain.Kind) response.KindResponse {
 		Books:       allBookResponse,
 	}
 }
+
+func ConvertToVisitorResponse(domainVisitor *domain.Visitor) response.VisitorResponse {
+	return response.VisitorResponse{
+		ID:        domainVisitor.ID,
+		NIN:       domainVisitor.NIN,
+		Name:      domainVisitor.Name,
+		Instance:  domainVisitor.Instance,
+		CreatedAt: domainVisitor.CreatedAt,
+		UpdatedAt: utils.NullTime{
+			Time:  domainVisitor.UpdatedAt.Time,
+			Valid: true,
+		},
+		DeletedAt: domainVisitor.DeletedAt,
+	}
+}
+
+func ConvertToEmployeeResponse(domainEmployee *domain.Employee) response.EmployeeResponse {
+	return response.EmployeeResponse{
+		ID:              domainEmployee.ID,
+		Name:            domainEmployee.Name,
+		Gender:          domainEmployee.Gender,
+		Position:        domainEmployee.Position,
+		TelephoneNumber: domainEmployee.TelephoneNumber,
+		Address:         domainEmployee.Address,
+		CreatedAt:       domainEmployee.CreatedAt,
+		UpdatedAt: utils.NullTime{
+			Time:  domainEmployee.UpdatedAt.Time,
+			Valid: true,
+		},
+		DeletedAt: domainEmployee.DeletedAt,
+	}
+}
